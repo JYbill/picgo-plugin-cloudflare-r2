@@ -9,6 +9,7 @@
     "target": "es2017",
     "declaration": true,
     "outDir": "dist",
+    "skipLibCheck": true,
     // It's shit.
     // "baseUrl": "src",
     // "paths": {

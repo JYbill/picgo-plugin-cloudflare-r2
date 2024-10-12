@@ -41,8 +41,9 @@ export = (ctx: PicGo) => {
 
         // 配置校验
         const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
+        // 重命名存储路径
+        const storageKey = config[ConfigEnum.SUB_FOLDER] ?? '/'
         const errMeg = verifyConfig(config)
-        ctx.log.info('errMeg', errMeg)
         if (errMeg) {
           notify(ctx, {
             title: '配置错误',
@@ -50,7 +51,6 @@ export = (ctx: PicGo) => {
           })
           return ctx.output
         }
-
         S3 = new S3Client({
           region: 'auto',
           endpoint: config[ConfigEnum.ENDPOINT],
@@ -62,8 +62,13 @@ export = (ctx: PicGo) => {
 
         for (const imageItem of ctx.output) {
           const { fileName: filename, buffer, base64Image, extname, imgUrl } = imageItem
-          // 重命名存储路径
-          const storageKey = config[ConfigEnum.SUB_FOLDER] ?? '/'
+          if ((/(\\|\/|:)/ig).test(filename)) {
+            notify(ctx, {
+              title: '上传文件名错误',
+              body: '请勿使用.:/\\此类具有歧义的符号'
+            })
+            continue
+          }
           // debug
           /* ctx.log.info('config', JSON.stringify({
             Bucket: config[ConfigEnum.BUCKET_NAME],
@@ -72,12 +77,12 @@ export = (ctx: PicGo) => {
           })) */
 
           try {
-            // 上传文件
+            // 格式化上传路径
             let uri = resolve(storageKey, filename) // 格式: /md/1.png、md/1.png
             if (uri.startsWith('/')) {
               uri = uri.slice(1)
             }
-
+            // 上传文件
             const objRes = await S3.send(new PutObjectCommand({
               Bucket: config[ConfigEnum.BUCKET_NAME],
               Body: buffer,
@@ -88,7 +93,6 @@ export = (ctx: PicGo) => {
             if (objRes.$metadata.httpStatusCode !== 200) {
               throw new Error('上传到存储桶失败，请检查原因')
             }
-            ctx.log.info('config', config.domain, uri)
             const url = new URL(uri, config.domain)
             imageItem.imgUrl = url.href
             imageItem.url = url.href
@@ -116,6 +120,7 @@ export = (ctx: PicGo) => {
       const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
       for (const file of files) {
         const { type, imgUrl, fileName } = file
+        ctx.log.info('file', file as any)
         if (type !== AppConfig.NAME) continue // 其他uploader
 
         // cloudflare-r2 uploader
@@ -130,6 +135,7 @@ export = (ctx: PicGo) => {
           Bucket: config[ConfigEnum.BUCKET_NAME],
           Key: pathname
         })).then((delRes) => {
+          ctx.log.info('remove success', delRes)
           notify(ctx, {
             title: '删除成功',
             body: `cloudflare-r2中成功删除${fileName}文件`

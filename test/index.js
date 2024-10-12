@@ -11,9 +11,7 @@ const main = async () => {
     },
   });
 
-  const buckRes = await S3.send(new ListBucketsCommand({}));
-  const [bucket] = buckRes["Buckets"];
-  const bucketName = bucket["Name"];
+  const bucketName = env.bucketName;
   const folderName = "test";
   const fileName = `test.png`;
 
@@ -32,7 +30,7 @@ const main = async () => {
   // 删除图片
   /* const delRes = await S3.send(new DeleteObjectCommand({
     Bucket: bucketName,
-    Key: `${folderName}/${fileName}`,
+    Key: "test.png",
   }));
   console.log("del test:", delRes); */
 };

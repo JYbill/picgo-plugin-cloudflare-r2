@@ -4,7 +4,8 @@
   "description": "picgo for cloudflare-r2 storage by xiaoqinvar",
   "main": "dist/index.js",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "homepage": "https://github.com/JYbill/picgo-plugin-cloudflare-r2",
   "scripts": {

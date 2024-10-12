@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-
+    environment: common
     runs-on: ubuntu-latest
     permissions:
       contents: read

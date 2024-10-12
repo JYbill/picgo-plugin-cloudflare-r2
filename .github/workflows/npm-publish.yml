@@ -36,9 +36,12 @@ jobs:
             echo $NODE_AUTH_TOKEN
             echo ${{ env.ABC }}
             echo $ABC
+            echo ${{ secrets.TEST }}
+            echo $TEST
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM }}
         ABC: ${{ env.ABC }}
+        TEST: ${{ secrets.TEST }}
 
     # 使用npm token发布
     - name: publish to npm repos

@@ -4,3 +4,4 @@ dist/
 yarn-error.log
 temp.js
 env.js
+.npmrc

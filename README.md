@@ -63,3 +63,8 @@ pnpm build
 
 ![](./docs/images/function3.png)
   > 删除成功如图
+
+
+## 推荐
+- 开启以下设置对文件名比较友好，对于大部分存储桶来说像"/"、"\"这种符号是不被允许的
+<img src="./docs/images/recommend1.png" width="80%">

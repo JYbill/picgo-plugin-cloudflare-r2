@@ -1,6 +1,6 @@
 {
   "name": "picgo-plugin-cloudflare-r2-xqv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "picgo for cloudflare-r2 storage by xiaoqinvar",
   "main": "dist/index.js",
   "publishConfig": {

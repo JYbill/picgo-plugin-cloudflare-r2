@@ -25,12 +25,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        registry-url: 'https://registry.npmjs.org'
-    - name: install dependence
-      run: npm ci
+        registry-url: 'https://registry.npmjs.org/'
 
-    - name: build production
-      run: npm run build
+    - run: npm ci
+    - run: npm run build
 
     # 使用npm token发布
     - name: publish to npm repos

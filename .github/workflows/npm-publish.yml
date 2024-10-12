@@ -24,6 +24,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        always-auth: true
         cache: 'npm'
         registry-url: 'https://registry.npmjs.org'
 

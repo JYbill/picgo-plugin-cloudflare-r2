@@ -31,14 +31,9 @@ jobs:
     - run: npm ci
     - run: npm run build
 
-    - name: debug
-      run: |
-            npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-            cat /home/runner/work/_temp/.npmrc
-
     # 使用npm token发布
     - name: publish to npm repos
       run: npm publish
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ secrets.NPM }}
 

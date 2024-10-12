@@ -36,6 +36,7 @@ jobs:
             npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
             cat /home/runner/work/_temp/.npmrc
 
+
     # 使用npm token发布
     - name: publish to npm repos
       run: npm publish

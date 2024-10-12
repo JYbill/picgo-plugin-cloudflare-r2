@@ -1,6 +1,3 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: publish npm repos CI
 
 on:
@@ -26,9 +23,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm install
+        registry-url: 'https://registry.npmjs.org'
+    - run: npm ci
     - run: npm run build
     # 使用npm token发布
-    - run: npm publish
+    - run: npm publish --provenance --access public
       env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

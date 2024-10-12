@@ -38,6 +38,8 @@ export = (ctx: PicGo) => {
     ctx.helper.uploader.register(AppConfig.NAME, {
       async handle (ctx) {
         const { default: mime } = await import('mime')
+
+        // 配置校验
         const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
         const errMeg = verifyConfig(config)
         ctx.log.info('errMeg', errMeg)
@@ -46,7 +48,7 @@ export = (ctx: PicGo) => {
             title: '配置错误',
             body: errMeg
           })
-          return
+          return ctx.output
         }
 
         S3 = new S3Client({
@@ -57,12 +59,6 @@ export = (ctx: PicGo) => {
             secretAccessKey: config[ConfigEnum.SECRET_ACCESS]
           }
         })
-        // 配置校验
-        const domain = config[ConfigEnum.DOMAIN]
-        if (!domain) {
-          notify(ctx, { title: '配置错误', body: '未填写访问域名地址' })
-          return ctx.output
-        }
 
         for (const imageItem of ctx.output) {
           const { fileName: filename, buffer, base64Image, extname, imgUrl } = imageItem
@@ -92,7 +88,8 @@ export = (ctx: PicGo) => {
             if (objRes.$metadata.httpStatusCode !== 200) {
               throw new Error('上传到存储桶失败，请检查原因')
             }
-            const url = new URL(uri, domain)
+            ctx.log.info('config', config.domain, uri)
+            const url = new URL(uri, config.domain)
             imageItem.imgUrl = url.href
             imageItem.url = url.href
           } catch (error) {
@@ -106,8 +103,6 @@ export = (ctx: PicGo) => {
             }
           }
         }
-
-        // ctx.log.info('uploader output', ctx.output as any)
         return ctx.output
       },
       // uploader配置
@@ -120,7 +115,7 @@ export = (ctx: PicGo) => {
     ctx.on('remove', (files: FileType[], guiApi) => {
       const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
       for (const file of files) {
-        const { type, imgUrl } = file
+        const { type, imgUrl, fileName } = file
         if (type !== AppConfig.NAME) continue // 其他uploader
 
         // cloudflare-r2 uploader
@@ -129,7 +124,6 @@ export = (ctx: PicGo) => {
         if (pathname.startsWith('/')) {
           pathname = pathname.slice(1)
         }
-        // ctx.log.info('pathname:', pathname) // debug
 
         // 删除文件
         S3.send(new DeleteObjectCommand({
@@ -138,7 +132,7 @@ export = (ctx: PicGo) => {
         })).then((delRes) => {
           notify(ctx, {
             title: '删除成功',
-            body: 'cloudflare-r2中成功删除该文件'
+            body: `cloudflare-r2中成功删除${fileName}文件`
           })
         }).catch((err: Error) => {
           ctx.log.info('remove error', err.message)

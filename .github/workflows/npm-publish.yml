@@ -30,6 +30,10 @@ jobs:
     - run: npm ci
     - run: npm run build
 
+    - run: echo $NPM_AUTH_TOKEN
+      env:
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
     # 使用npm token发布
     - name: publish to npm repos
       run: npm publish

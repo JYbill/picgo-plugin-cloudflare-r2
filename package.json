@@ -1,12 +1,12 @@
 {
   "name": "picgo-plugin-cloudflare-r2-xqv",
   "version": "1.0.0",
-  "description": "picgo for cloudflare-r2 storage",
+  "description": "picgo for cloudflare-r2 storage by xiaoqinvar",
   "main": "dist/index.js",
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "",
+  "homepage": "https://github.com/JYbill/picgo-plugin-cloudflare-r2",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc -p .",

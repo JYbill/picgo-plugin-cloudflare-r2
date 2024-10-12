@@ -3,7 +3,8 @@ export enum ConfigEnum {
   ENDPOINT = 'endpoint',
   ACCESS_KEY = 'accessKeyId',
   SECRET_ACCESS = 'secretAccessKey',
-  BUCKET_NAME = 'bucketName'
+  BUCKET_NAME = 'bucketName',
+  SUB_FOLDER = 'subFolder',
 }
 
 export enum AppConfig {

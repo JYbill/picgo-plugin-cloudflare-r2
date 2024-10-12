@@ -35,5 +35,12 @@ export const UploaderConfig = [
     type: 'input',
     default: 'md',
     required: true
+  },
+  {
+    alias: '目录',
+    name: ConfigEnum.SUB_FOLDER,
+    type: 'input',
+    default: '',
+    required: true
   }
 ]

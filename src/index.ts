@@ -14,7 +14,7 @@ let S3 = null
  * @param text
  */
 const notify = (ctx: IPicGo, {
-  title, body, text
+  title, body, text = ''
 }: {
   title: string
   body: string
@@ -28,36 +28,8 @@ const notify = (ctx: IPicGo, {
 }
 
 export = (ctx: PicGo) => {
-  const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
-  S3 = new S3Client({
-    region: config[ConfigEnum.REGION],
-    endpoint: config[ConfigEnum.ENDPOINT],
-    credentials: {
-      accessKeyId: config[ConfigEnum.ACCESS_KEY],
-      secretAccessKey: config[ConfigEnum.SECRET_ACCESS]
-    }
-  })
-
   // 注册
   const register = (ctx: IPicGo) => {
-    /**
-     * 转换之前的钩子
-     */
-    ctx.helper.beforeTransformPlugins.register(AppConfig.NAME, {
-      async handle (ctx) {
-        const buckRes = await S3.send(new ListBucketsCommand({}))
-        ctx.log.info('bucket', buckRes)
-        if (buckRes.$metadata.httpStatusCode !== 200 && !buckRes.Buckets[0]) {
-          notify(ctx, {
-            title: 'cloudflare配置错误',
-            body: '无法读取到对应存储桶信息',
-            text: '无法读取到对应存储桶信息'
-          })
-        }
-        return ctx
-      }
-    })
-
     /**
      * Uploader组件
      */
@@ -65,10 +37,47 @@ export = (ctx: PicGo) => {
 
       // 根据ctx.output上传文件并输出为新的ctx.output
       async handle (ctx) {
+        const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
+        S3 = new S3Client({
+          region: config[ConfigEnum.REGION],
+          endpoint: config[ConfigEnum.ENDPOINT],
+          credentials: {
+            accessKeyId: config[ConfigEnum.ACCESS_KEY],
+            secretAccessKey: config[ConfigEnum.SECRET_ACCESS]
+          }
+        })
+
         // ctx.log.info(JSON.stringify(ctx.output[0]))
         for (const imageItem of ctx.output) {
           const filename = imageItem.fileName
           const buffer = imageItem.buffer
+          let storageKey = config[ConfigEnum.SUB_FOLDER]
+          if (storageKey.startsWith('/')) {
+            storageKey = storageKey.slice(1)
+          }
+
+          ctx.log.info('config', JSON.stringify({
+            Bucket: config[ConfigEnum.BUCKET_NAME],
+            Key: `${storageKey}${filename}`,
+            ContentType: 'image/png'
+          }))
+
+          try {
+            const objRes = await S3.send(new PutObjectCommand({
+              Bucket: config[ConfigEnum.BUCKET_NAME],
+              Body: buffer,
+              Key: `${storageKey}${filename}`,
+              ContentType: 'image/png'
+            }))
+            ctx.log.info('objRes', objRes)
+          } catch (error) {
+            ctx.log.error('uploader error', error)
+            if (error.name.includes('NoSuchBucket')) {
+              notify(ctx, { title: '上传错误', body: '对应的存储桶不存在' })
+            } else {
+              notify(ctx, { title: '上传错误', body: error.message })
+            }
+          }
         }
         return ctx.output
       },

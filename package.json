@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc -p .",
     "build:watch": "tsc -w -p .",
-    "dev": "node --watch ./test.js",
+    "dev": "node --watch test/test.js",
     "lint": "eslint src --fix",
     "patch": "npm version patch && git push origin master && git push origin --tags",
     "minor": "npm version minor && git push origin master && git push origin --tags",

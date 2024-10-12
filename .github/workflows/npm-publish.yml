@@ -30,7 +30,9 @@ jobs:
     - run: npm ci
     - run: npm run build
 
-    - run: echo "$NPM_AUTH_TOKEN"
+    - run: |
+            echo "debug $NPM_AUTH_TOKEN"
+            cat .npmrc
       env:
         NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

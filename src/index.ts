@@ -4,6 +4,7 @@ import { S3Client, ListBucketsCommand, PutObjectCommand, DeleteObjectCommand } f
 import { AppConfig, ConfigEnum } from './index.enum'
 import { UploaderConfig } from './config'
 import { resolve } from 'path'
+import { verifyConfig } from './utils'
 
 let S3 = null
 
@@ -29,32 +30,23 @@ const notify = (ctx: IPicGo, {
 }
 
 export = (ctx: PicGo) => {
-  const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
-  S3 = new S3Client({
-    region: config[ConfigEnum.REGION],
-    endpoint: config[ConfigEnum.ENDPOINT],
-    credentials: {
-      accessKeyId: config[ConfigEnum.ACCESS_KEY],
-      secretAccessKey: config[ConfigEnum.SECRET_ACCESS]
-    }
-  })
-
   // 注册
   const register = (ctx: IPicGo) => {
     /**
      * Uploader组件
      */
     ctx.helper.uploader.register(AppConfig.NAME, {
-
-      // 根据ctx.output上传文件并输出为新的ctx.output
       async handle (ctx) {
         const { default: mime } = await import('mime')
         const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
-        // 配置校验
-        const domain = config[ConfigEnum.DOMAIN]
-        if (!domain) {
-          notify(ctx, { title: '配置错误', body: '未填写访问域名地址' })
-          return ctx.output
+        const errMeg = verifyConfig(config)
+        ctx.log.info('errMeg', errMeg)
+        if (errMeg) {
+          notify(ctx, {
+            title: '配置错误',
+            body: errMeg
+          })
+          return
         }
 
         S3 = new S3Client({
@@ -65,6 +57,12 @@ export = (ctx: PicGo) => {
             secretAccessKey: config[ConfigEnum.SECRET_ACCESS]
           }
         })
+        // 配置校验
+        const domain = config[ConfigEnum.DOMAIN]
+        if (!domain) {
+          notify(ctx, { title: '配置错误', body: '未填写访问域名地址' })
+          return ctx.output
+        }
 
         for (const imageItem of ctx.output) {
           const { fileName: filename, buffer, base64Image, extname, imgUrl } = imageItem
@@ -90,6 +88,7 @@ export = (ctx: PicGo) => {
               Key: uri,
               ContentType: mime.getType(extname)
             }))
+            ctx.log.info('objRes', objRes)
             if (objRes.$metadata.httpStatusCode !== 200) {
               throw new Error('上传到存储桶失败，请检查原因')
             }
@@ -100,13 +99,15 @@ export = (ctx: PicGo) => {
             ctx.log.error('uploader error', error)
             if (error.name.includes('NoSuchBucket')) {
               notify(ctx, { title: '上传错误', body: '对应的存储桶不存在' })
+            } else if (error.name.includes('InvalidBucketName')) {
+              notify(ctx, { title: '上传错误', body: '存储桶名称至少三个字符' })
             } else {
               notify(ctx, { title: '上传错误', body: error.message })
             }
           }
         }
 
-        ctx.log.info('uploader output', ctx.output as any)
+        // ctx.log.info('uploader output', ctx.output as any)
         return ctx.output
       },
       // uploader配置
@@ -117,18 +118,37 @@ export = (ctx: PicGo) => {
      * 移除图片事件
      */
     ctx.on('remove', (files: FileType[], guiApi) => {
+      const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
       for (const file of files) {
-        const { fileName, type } = file
-        S3.send(new DeleteObjectCommand({
-          Bucket: bucketName,
-          Key: `${folderName}/${fileName}`
-        })).then((delRes) => {
+        const { type, imgUrl } = file
+        if (type !== AppConfig.NAME) continue // 其他uploader
 
-        }).catch((err: any) => {
-          ctx.log.info('remove error', err)
+        // cloudflare-r2 uploader
+        const url = new URL(imgUrl)
+        let pathname = url.pathname
+        if (pathname.startsWith('/')) {
+          pathname = pathname.slice(1)
+        }
+        // ctx.log.info('pathname:', pathname) // debug
+
+        // 删除文件
+        S3.send(new DeleteObjectCommand({
+          Bucket: config[ConfigEnum.BUCKET_NAME],
+          Key: pathname
+        })).then((delRes) => {
+          notify(ctx, {
+            title: '删除成功',
+            body: 'cloudflare-r2中成功删除该文件'
+          })
+        }).catch((err: Error) => {
+          ctx.log.info('remove error', err.message)
+          notify(ctx, {
+            title: '删除失败❌',
+            body: err.message
+          })
         })
       }
-      ctx.log.info('remove event:', JSON.stringify(files))
+      // ctx.log.info('remove event:', JSON.stringify(files))
     })
   }
   return {

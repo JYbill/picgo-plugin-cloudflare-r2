@@ -1,11 +1,12 @@
 export enum ConfigEnum {
-  REGION = 'region',
+  // 必须存在的配置
   ENDPOINT = 'endpoint',
   ACCESS_KEY = 'accessKeyId',
   SECRET_ACCESS = 'secretAccessKey',
   BUCKET_NAME = 'bucketName',
+  DOMAIN = 'domain',
+  // 可选
   SUB_FOLDER = 'subFolder',
-  DOMAIN = 'domain'
 }
 
 export enum AppConfig {

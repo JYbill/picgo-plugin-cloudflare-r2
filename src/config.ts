@@ -29,7 +29,7 @@ export const UploaderConfig = [
     alias: '存储桶名',
     name: ConfigEnum.BUCKET_NAME,
     type: 'input',
-    default: 'md',
+    default: 'markdown',
     message: '存储桶名称',
     required: true
   },

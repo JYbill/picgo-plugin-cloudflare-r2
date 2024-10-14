@@ -25,23 +25,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         always-auth: true
-        # cache: 'npm'
+        cache: 'npm'
         registry-url: 'https://registry.npmjs.org'
 
     - run: npm ci
     - run: npm run build
-
-    - name: DEBUG
-      run: |
-            echo $NODE_AUTH_TOKEN
-            echo ${{ env.ABC }}
-            echo $ABC
-            echo ${{ secrets.TEST }}
-            echo $TEST
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM }}
-        ABC: ${{ env.ABC }}
-        TEST: ${{ secrets.TEST }}
 
     # 使用npm token发布
     - name: publish to npm repos

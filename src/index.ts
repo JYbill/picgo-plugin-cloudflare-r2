@@ -6,8 +6,6 @@ import { UploaderConfig } from './config'
 import { resolve } from 'path'
 import { verifyConfig } from './utils'
 
-let S3 = null
-
 /**
  * 消息通知函数
  * @param ctx
@@ -51,7 +49,7 @@ export = (ctx: PicGo) => {
           })
           return ctx.output
         }
-        S3 = new S3Client({
+        const S3 = new S3Client({
           region: 'auto',
           endpoint: config[ConfigEnum.ENDPOINT],
           credentials: {
@@ -89,7 +87,7 @@ export = (ctx: PicGo) => {
               Key: uri,
               ContentType: mime.getType(extname)
             }))
-            ctx.log.info('objRes', objRes)
+            ctx.log.info('objRes', objRes as any)
             if (objRes.$metadata.httpStatusCode !== 200) {
               throw new Error('上传到存储桶失败，请检查原因')
             }
@@ -118,6 +116,15 @@ export = (ctx: PicGo) => {
      */
     ctx.on('remove', (files: FileType[], guiApi) => {
       const config = ctx.getConfig<Record<string, string>>('picBed.cloudflare-r2')
+      const S3 = new S3Client({
+        region: 'auto',
+        endpoint: config[ConfigEnum.ENDPOINT],
+        credentials: {
+          accessKeyId: config[ConfigEnum.ACCESS_KEY],
+          secretAccessKey: config[ConfigEnum.SECRET_ACCESS]
+        }
+      })
+
       for (const file of files) {
         const { type, imgUrl, fileName } = file
         ctx.log.info('file', file as any)
@@ -131,11 +138,12 @@ export = (ctx: PicGo) => {
         }
 
         // 删除文件
+        ctx.log.info('remove file', pathname)
         S3.send(new DeleteObjectCommand({
           Bucket: config[ConfigEnum.BUCKET_NAME],
           Key: pathname
         })).then((delRes) => {
-          ctx.log.info('remove success', delRes)
+          ctx.log.info('remove success', delRes as any)
           notify(ctx, {
             title: '删除成功',
             body: `cloudflare-r2中成功删除${fileName}文件`

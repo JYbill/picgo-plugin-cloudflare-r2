@@ -1,11 +1,10 @@
 {
-  "name": "picgo-plugin-cloudflare-r2-xqv",
-  "version": "1.0.1",
+  "name": "picgo-plugin-cloudflare-r2",
+  "version": "1.0.2",
   "description": "picgo for cloudflare-r2 storage by xiaoqinvar",
   "main": "dist/index.js",
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
+    "access": "public"
   },
   "homepage": "https://github.com/JYbill/picgo-plugin-cloudflare-r2",
   "scripts": {

@@ -3,7 +3,7 @@ import type { IPicGo } from 'picgo'
 import { S3Client, ListBucketsCommand, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { AppConfig, ConfigEnum } from './index.enum'
 import { UploaderConfig } from './config'
-import { resolve } from 'path'
+import { join } from 'path'
 import { verifyConfig } from './utils'
 
 /**
@@ -76,7 +76,8 @@ export = (ctx: PicGo) => {
 
           try {
             // 格式化上传路径
-            let uri = resolve(storageKey, filename) // 格式: /md/1.png、md/1.png
+            let uri = join(storageKey, filename) // 格式: /md/1.png
+            ctx.log.info('uri', uri as any)
             if (uri.startsWith('/')) {
               uri = uri.slice(1)
             }

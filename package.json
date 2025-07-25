@@ -41,5 +41,10 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.669.0",
     "mime": "^4.0.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "ejs"
+    ]
   }
 }

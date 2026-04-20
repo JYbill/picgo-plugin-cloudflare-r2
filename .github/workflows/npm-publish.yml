@@ -27,6 +27,7 @@ jobs:
         always-auth: true
         cache: 'npm'
         registry-url: 'https://registry.npmjs.org'
+    - run: npm -v
     - run: npm ci
     - run: npm run build
     - name: trust publish

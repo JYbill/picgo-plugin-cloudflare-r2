@@ -19,21 +19,16 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
         always-auth: true
         cache: 'npm'
         registry-url: 'https://registry.npmjs.org'
-
     - run: npm ci
     - run: npm run build
-
-    # 使用npm token发布
-    - name: publish to npm repos
+    - name: trust publish
       run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM }}
 

@@ -17,6 +17,7 @@
     "build:watch": "tsc -w -p .",
     "dev": "node --watch test/index.js",
     "lint": "eslint src --fix",
+    "skills:update": "skills add JYbill/xqv-skills --copy -a universal -y -s ddt -s notes -s test-optimize",
     "patch": "npm version patch && git push origin master && git push origin --tags",
     "minor": "npm version minor && git push origin master && git push origin --tags",
     "major": "npm version major && git push origin master && git push origin --tags"
@@ -41,6 +42,7 @@
     "eslint-plugin-promise": "^6.1.0",
     "eslint-plugin-standard": "^3.1.0",
     "picgo": "^1.6.6",
+    "skills": "^1.7.0",
     "typescript": "5.9.3"
   },
   "dependencies": {

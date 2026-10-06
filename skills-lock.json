@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "ddt": {
+      "source": "JYbill/xqv-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ddt/SKILL.md",
+      "computedHash": "d1b038f9a38b310c51b4e47013b9329e76be3b3368ab22c695d44402c28eccc6"
+    },
+    "notes": {
+      "source": "JYbill/xqv-skills",
+      "sourceType": "github",
+      "skillPath": "skills/notes/SKILL.md",
+      "computedHash": "305bf3e8a5c0cca0d0b7529abb6c90418595ee8802f20c959d80864320655852"
+    },
+    "test-optimize": {
+      "source": "JYbill/xqv-skills",
+      "sourceType": "github",
+      "skillPath": "skills/test-optimize/SKILL.md",
+      "computedHash": "693a410b156b3e3e13c7f43880fb7d30d9968a35fd12739ca184d184b64d3339"
+    }
+  }
+}

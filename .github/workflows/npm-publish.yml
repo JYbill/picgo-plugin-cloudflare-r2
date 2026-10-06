@@ -29,7 +29,6 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
     - run: npm -v
     - run: npm ci
-    - run: npm run build
+    - run: npm test
     - name: trust publish
       run: npm publish
-
